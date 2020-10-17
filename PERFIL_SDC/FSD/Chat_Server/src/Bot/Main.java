@@ -1,0 +1,21 @@
+package Bot;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.Socket;
+
+public class Main {
+    public static void main(String[] args) {
+        try {
+            Socket server = new Socket("127.0.0.1", 12345);
+            BufferedReader in = new BufferedReader(new InputStreamReader(server.getInputStream()));
+            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(server.getOutputStream()));
+            new Writter(out, "bot.\n", Integer.parseInt(args[0])).start();
+            new Reader(in, Integer.parseInt(args[1])).start();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+}
