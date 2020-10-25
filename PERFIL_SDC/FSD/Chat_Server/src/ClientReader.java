@@ -17,7 +17,7 @@ public class ClientReader extends Thread {
             BufferedReader r = new BufferedReader(new InputStreamReader(client.getInputStream()));
             String line = null;
             while ((line = r.readLine()) != null) {
-                System.out.println("[Recieved][" + client.toString() + "]:\t" + line);
+                //System.out.println("[Recieved][" + client.toString() + "]:\t" + line);
                 messages.addMessage(line);
             }
         } catch (Exception e){
