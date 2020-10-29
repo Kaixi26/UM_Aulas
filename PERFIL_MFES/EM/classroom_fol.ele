@@ -101,7 +101,8 @@ pred inv11 {
 
 /* Each teacher is responsible for some groups. */
 pred inv12 {
-
+	all t : Teacher | some c : Class, p : Person, g : Group
+  		| c->p->g in Groups and t->c in Teaches
 }
 
 /* Only teachers tutor, and only students are tutored. */
@@ -113,7 +114,8 @@ pred inv13 {
 /* Every student in a class is at least tutored by the teachers
  * assigned to that class. */
 pred inv14 {
-  
+	all p1, p2 : Person, c : Class, g : Group
+  		| (c->p1->g in Groups and p2->c in Teaches) implies p2->p1 in Tutors
 }
 
 /* Assuming a universe of 3 persons, the tutoring chain of every
@@ -121,5 +123,3 @@ pred inv14 {
 pred inv15 {
 
 }
-
-
