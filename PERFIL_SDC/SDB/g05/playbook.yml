@@ -1,0 +1,62 @@
+---
+- name: update web servers
+  hosts: all
+  remote_user: kaixi
+
+  tasks:
+          - name: update system packages
+            become: yes
+            apt: upgrade=dist force_apt_get=yes
+
+          - name: Install vim-nox openntpd and sudo
+            become: yes
+            apt:
+                pkg:
+                    - sudo
+                    - vim-nox
+                    - openntpd
+
+          - name: "Add user tester with password 123456"
+            become: yes
+            user:
+                    name: tester
+                    password: "$6$acucar$jmUTcBFhEnx2ML3btUnyKKD48Qp5CeBv4BUHR/ItE6N9O1neAe71tZJZPIeoumQvlzHajWTKCZe.bxjCD5tgm1"
+                    create_home: yes
+          - name: Add tester to sudo group
+            become: yes
+            user:
+                    name: tester
+                    group: admin
+
+          - name: "Prepare the user tester for SSH public key authentication"
+            become: yes
+            authorized_key:
+                    user: tester
+                    state: present
+                    key: "{{ lookup('file', '/home/vagrant/.ssh/id_rsa.pub') }}"
+
+          - name: "Disable password authentication for OpenSSH"
+            become: yes
+            lineinfile:
+                    path: /etc/ssh/sshd_config
+                    regexp: '^#?PasswordAuthentication'
+                    line: "PasswordAuthentication no"
+
+          - name: "Disable root authentication for OpenSSH"
+            become: yes
+            lineinfile:
+                    path: /etc/ssh/sshd_config
+                    regexp: '^#?PermitRootLogin'
+                    line: "PermitRootLogin no"
+
+          - name: Start service sshd, if not started
+            become: yes
+            service:
+                    name: sshd
+                    state: started
+
+          - name: Start service OpenNTPD, if not started
+            become: yes
+            service:
+                    name: openntpd
+                    state: started
