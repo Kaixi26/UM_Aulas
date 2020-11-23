@@ -1,0 +1,8 @@
+all:
+  children:
+    webservers:
+      hosts:
+        34.76.168.62
+    dbservers:
+      hosts:
+        34.77.43.226:

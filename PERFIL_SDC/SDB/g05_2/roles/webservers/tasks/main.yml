@@ -1,0 +1,79 @@
+
+- name: Swap | Add repository for php
+  apt_repository:
+    repo: ppa:ondrej/php
+
+- name: Add Yarn apt key
+  apt_key:
+    url: https://dl.yarnpkg.com/debian/pubkey.gpg
+
+- name: Add Yarn repository
+  apt_repository:
+    repo: "deb https://dl.yarnpkg.com/debian/ stable main"
+    filename: yarn
+
+- name: Swap | Update packages
+  apt: update_cache=yes force_apt_get=yes
+
+- name: Install necessary packages
+  apt:
+    pkg:
+      - php7.4
+      - php7.4-fpm
+      - php7.4-zip
+      - php7.4-mbstring
+      - php7.4-tokenizer
+      - php7.4-mysql
+      - php7.4-gd
+      - php7.4-xml
+      - php7.4-bcmath
+      - php7.4-intl
+      - php7.4-curl
+      - nodejs
+      - composer
+      - yarn
+      - npm
+
+- name: Swap | Clone a repo with separate git directory
+  become: no
+  git:
+    repo: https://github.com/Hackathonners/swap
+    dest: /home/kaixi/swap
+
+- name: Swap | Copying env template
+  become: no
+  template:
+    src: template.env
+    dest: /home/kaixi/swap/.env
+
+- name: Swap | Install composer dependencies
+  shell:
+    cmd: composer install
+    chdir: /home/kaixi/swap/
+
+- name: Swap Install yarn depencencies
+  shell: 
+    cmd: yarn install
+    chdir: /home/kaixi/swap/
+
+- name: Generate application key
+  shell: 
+    cmd: php artisan key:generate
+    chdir: /home/kaixi/swap/
+
+
+- name: Generate application key [1/2]
+  shell: 
+    cmd: php artisan migrate
+    chdir: /home/kaixi/swap/
+
+- name: Generate application key [2/2]
+  shell: 
+    cmd: php artisan db:seed
+    chdir: /home/kaixi/swap/
+
+
+- name: Build Assets
+  shell: 
+    cmd: npm run dev
+    chdir: /home/kaixi/swap/

@@ -1,0 +1,50 @@
+---
+- name: MySQL | update system packages
+  apt: upgrade=dist force_apt_get=yes
+
+- name: MySQL | Install mysql server
+  apt:
+    pkg:
+      - mysql-server
+      - python3-pymysql # needed to manage databases
+
+- name: MySQL | Set the root password.
+  mysql_user: 
+    login_user: root
+    login_password: root
+    host: localhost
+    name: root 
+    password: root
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: MySQL | Create database swap
+  no_log: yes
+  mysql_db:
+    login_user: root
+    login_password: root
+    name: swap
+    state: present
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: MySQL | Create swap user with permissions on swap database
+  mysql_user: 
+    login_user: root
+    login_password: root
+    host: 10.132.0.6
+    name: swap
+    password: swap
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    priv:
+      'swap.*': 'ALL'
+
+- name: MySQL | Change bind-address to 0.0.0.0
+  lineinfile:
+    path: /etc/mysql/mysql.conf.d/mysqld.cnf
+    regexp: "^bind-address.*"
+    line: "bind-address            = 0.0.0.0"
+
+- name: MySQL | Restart mysql
+  service:
+    name: mysql
+    state: restarted
+
