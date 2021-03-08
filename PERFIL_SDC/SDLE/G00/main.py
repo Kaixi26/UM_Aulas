@@ -17,7 +17,8 @@ def genConnected(size):
 
 max_size = 100
 step = 10
-repetitions = 25
+repetitions = 25 
+
 
 size_list = [x for x in range(10,(max_size+1),step)]
 added_vertices_list = [0 for x in size_list]
